@@ -1,0 +1,21 @@
+# General Files to be excluded
+pom-backup.xml
+
+# Maven derived files that should not be committed
+target/*
+robots/*
+config/*
+${robocode.home}/*
+.checkstyle
+.pmd
+.pmdruleset
+/${robocode.home}
+target
+config
+robots
+
+# Eclipse derived files that should not be committed
+
+.settings/*
+.settings
+
