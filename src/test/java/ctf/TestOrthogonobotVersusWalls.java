@@ -24,18 +24,18 @@ public class TestOrthogonobotVersusWalls extends RobotTestBed {
   }
 
   /**
-   * This test runs for 10 rounds.
+   * This test runs for 50 rounds.
    * 
    * @return The number of rounds.
    */
   @Override
   public int getNumRounds() {
-    return 100;
+    return 50;
   }
 
   /**
-   * The actual test, which asserts that {@link Orthogonobot} has won at least one round against
-   * Walls.
+   * The actual test, which asserts that {@link Orthogonobot} has won at least 90% of the rounds
+   * against Walls.
    * 
    * @param event Details about the completed battle.
    */
@@ -48,9 +48,8 @@ public class TestOrthogonobotVersusWalls extends RobotTestBed {
 
     String robotName = OrthogonobotResults.getTeamLeaderName();
     assertEquals("Check that results[0] is Orthogonobot", "ctf.Orthogonobot*", robotName);
-  
 
-    // Check to make sure Orthogonobot at least one round.
+    // Check to make sure Orthogonobot at least 90% of the rounds.
     assertTrue("Check Orthogonobot winner", OrthogonobotResults.getFirsts() > getNumRounds() * 0.9);
   }
 }

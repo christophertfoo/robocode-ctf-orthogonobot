@@ -101,6 +101,11 @@ public class Point {
     return result;
   }
 
+  /**
+   * Returns the {@link String} version of this {@link Point} which contains its x and y coordinate.
+   * 
+   * @return The String version of this Point.
+   */
   @Override
   public String toString() {
     return "( " + this.x + ", " + this.y + ")";

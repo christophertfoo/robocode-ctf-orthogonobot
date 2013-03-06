@@ -12,12 +12,41 @@ import robocode.Robot;
  */
 public class NearEdgeCondition extends Condition {
 
+  /**
+   * The {@link EdgeCase} describing which edge of the battlefield triggered this
+   * {@link NearEdgeCondition}.
+   */
   private EdgeCase edgeCase = EdgeCase.NONE;
+
+  /**
+   * The {@link Robot} to check to determine whether this {@link NearEdgeCondition} should be
+   * triggered.
+   */
   private Robot robot;
+
+  /**
+   * The closest that the {@link Robot} should get to the edge of the battlefield.
+   */
   private final double EDGE_DISTANCE;
+
+  /**
+   * The width of the battlefield.
+   */
   private final double battlefieldWidth;
+
+  /**
+   * The height of the battlefield.
+   */
   private final double battlefieldHeight;
+
+  /**
+   * The width of the {@link Robot} (from the center of the robot to the edge).
+   */
   private final double robotWidth;
+
+  /**
+   * The height of the {@link Robot} (from the center of the robot to the edge).
+   */
   private final double robotHeight;
 
   /**
@@ -38,6 +67,8 @@ public class NearEdgeCondition extends Condition {
   }
 
   /**
+   * Checks which {@link EdgeCase} should be triggered based upon the {@link Robot}'s current
+   * location on the battlefield.
    * 
    * @param x The current X coordinate of the Robot.
    * @param y The current Y coordinate of the Robot.
@@ -107,6 +138,7 @@ public class NearEdgeCondition extends Condition {
    */
   @Override
   public boolean test() {
+    this.robot.out.println("Test!");
     this.edgeCase =
         this.checkNearEdge(this.robot.getX(), this.robot.getY(), this.robotWidth, this.robotHeight);
     return !this.edgeCase.equals(EdgeCase.NONE);
@@ -120,5 +152,4 @@ public class NearEdgeCondition extends Condition {
   public EdgeCase getEdgeCase() {
     return this.edgeCase;
   }
-
 }

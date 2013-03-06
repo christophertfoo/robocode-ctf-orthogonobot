@@ -25,17 +25,26 @@ public final class EnemyTuple {
   private double energy;
 
   /**
+   * The {@link Point} the enemy is at.
+   */
+  private Point location;
+
+  /**
    * Creates a new {@link EnemyTuple} with the given values.
    * 
    * @param absBearing The absolute bearing to the enemy (relative bearing + this
    * {@link Orthogonobot}'s heading).
    * @param distance The distance between this Orthogonobot and the enemy.
    * @param energy The amount of energy that the enemy has.
+   * @param scannerX The x-coordinate of this Orthogonobot.
+   * @param scannerY The y-coordinate of this Orthogonobot.
    */
-  public EnemyTuple(double absBearing, double distance, double energy) {
+  public EnemyTuple(double absBearing, double distance, double energy, double scannerX,
+      double scannerY) {
     this.absBearing = absBearing;
     this.distance = distance;
     this.energy = energy;
+    this.location = Helpers.calculateLocation(absBearing, distance, scannerX, scannerY);
   }
 
   /**
@@ -64,5 +73,13 @@ public final class EnemyTuple {
    */
   public double getEnergy() {
     return this.energy;
+  }
+  
+  /**
+   * Gets the {@link Point} representing the enemy's location.
+   * @return The enemy's location.
+   */
+  public Point getLocation() {
+    return this.location;
   }
 }

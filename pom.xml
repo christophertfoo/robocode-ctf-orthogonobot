@@ -238,8 +238,8 @@
             </goals>
             <configuration>
               <check>
-                <classRatio>75</classRatio>
-                <methodRatio>75</methodRatio>
+                <classRatio>85</classRatio>
+                <methodRatio>85</methodRatio>
               </check>
             </configuration>
           </execution>

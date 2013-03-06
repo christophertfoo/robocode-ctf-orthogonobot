@@ -24,17 +24,17 @@ public class TestOrthogonobotVersusFire extends RobotTestBed {
   }
 
   /**
-   * This test runs for 10 rounds.
+   * This test runs for 50 rounds.
    * 
    * @return The number of rounds.
    */
   @Override
   public int getNumRounds() {
-    return 100;
+    return 50;
   }
 
   /**
-   * The actual test, which asserts that {@link Orthogonobot} has won at least a third of the rounds
+   * The actual test, which asserts that {@link Orthogonobot} has won at least 90% of the rounds
    * against Fire.
    * 
    * @param event Details about the completed battle.
@@ -45,10 +45,10 @@ public class TestOrthogonobotVersusFire extends RobotTestBed {
     BattleResults[] battleResults = event.getIndexedResults();
     // Sanity check that results[0] is Orthogonobot.
     BattleResults OrthogonobotResults = battleResults[0];
-     String robotName = OrthogonobotResults.getTeamLeaderName();
-     assertEquals("Check that results[1] is Orthogonobot", "ctf.Orthogonobot*", robotName);
+    String robotName = OrthogonobotResults.getTeamLeaderName();
+    assertEquals("Check that results[1] is Orthogonobot", "ctf.Orthogonobot*", robotName);
 
-    // Check to make sure Orthogonobot won a third of the rounds.
+    // Check to make sure Orthogonobot won 90% of the rounds.
     assertTrue("Check Orthogonobot winner", OrthogonobotResults.getFirsts() > getNumRounds() * 0.9);
   }
 }

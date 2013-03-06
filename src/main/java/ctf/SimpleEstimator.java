@@ -14,6 +14,8 @@ public class SimpleEstimator implements VectorEstimator {
    * the given Points. Assumes that the Points are valid as determined by
    * {@link MovementVector#validVectorPoints}.
    * 
+   * Just chooses the first and last points in the given set of Points.
+   * 
    * @param points The Points used to estimate the MovementVector.
    * @return A {@link Pair} containing the starting (retrieve with {@link Pair#getValue1()}) and
    * ending (retrieve with {@link Pair#getValue2()) Points of the estimated linear MovementVector.
