@@ -24,9 +24,14 @@ import robocode.util.Utils;
 public class Orthogonobot extends AdvancedRobot {
 
   /**
-   * The distance that this {@link Orthogonobot} should stay from the edge of the battlefield.
+   * The distance that an {@link Orthogonobot} should stay from the edge of the battlefield.
    */
-  private static final int EDGE_DISTANCE = 40;
+  private static final int EDGE_DISTANCE = 150;
+  
+  /**
+   * The distance that an {@link Orthogonobot} should move when trying to dodge a bullet.
+   */
+  private static final double DODGE_AMOUNT = 40;
 
   /**
    * The {@link HashMap} containing the information about the enemy {@link Robots}.
@@ -100,10 +105,10 @@ public class Orthogonobot extends AdvancedRobot {
         - EDGE_DISTANCE - robotWidth)
         && (forwardY > robotHeight + EDGE_DISTANCE || forwardY < this.getBattleFieldHeight()
             - EDGE_DISTANCE - robotHeight)) {
-      return 100;
+      return DODGE_AMOUNT;
     }
     else {
-      return -100;
+      return -1 * DODGE_AMOUNT;
     }
   }
 
@@ -174,20 +179,16 @@ public class Orthogonobot extends AdvancedRobot {
       case NAVIGATION:
         if (Math.abs(this.getDistanceRemaining()) < 1) {
           this.currentMode = BattleMode.NORMAL;
-          out.println("Exiting Navigation mode?");
           this.currentVelocity = Math.abs(this.currentVelocity);
         }
         break;
 
       // Stay somewhat perpendicular to the closest enemy
       case NORMAL:
-        out.println("NORMAL MODE");
-
         double currentX = this.getX();
         double currentY = this.getY();
         double currentHeading = this.getHeading();
         if (shortestDeltaEnergy < 0) {
-          out.println("MOVE!");
           this.bodyTurnAngle = 0;
           this.currentVelocity =
               this.determineVelocity(currentX, currentY, currentHeading, robotWidth, robotHeight);
@@ -264,7 +265,6 @@ public class Orthogonobot extends AdvancedRobot {
 
     if (eventCondition.getName().equals("nearEdge") && this.currentMode != BattleMode.NAVIGATION) {
       this.currentMode = BattleMode.NAVIGATION;
-      out.println("Entering NAVIGATION mode.");
       switch (((NearEdgeCondition) eventCondition).getEdgeCase()) {
       case BOTTOM:
         this.bodyTurnAngle = Utils.normalRelativeAngleDegrees(-this.getHeading());
@@ -318,7 +318,9 @@ public class Orthogonobot extends AdvancedRobot {
    */
   @Override
   public void onHitWall(HitWallEvent event) {
-    this.currentVelocity *= -1;
+    if (this.currentMode != BattleMode.NAVIGATION) {
+      out.println("OOOPS!");
+    }
   }
 
   /**

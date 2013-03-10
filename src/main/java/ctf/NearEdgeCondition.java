@@ -138,7 +138,6 @@ public class NearEdgeCondition extends Condition {
    */
   @Override
   public boolean test() {
-    this.robot.out.println("Test!");
     this.edgeCase =
         this.checkNearEdge(this.robot.getX(), this.robot.getY(), this.robotWidth, this.robotHeight);
     return !this.edgeCase.equals(EdgeCase.NONE);
