@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import robocode.AdvancedRobot;
-import robocode.BulletMissedEvent;
 import robocode.Condition;
 import robocode.CustomEvent;
 import robocode.HitWallEvent;
@@ -27,7 +26,7 @@ public class Orthogonobot extends AdvancedRobot {
    * The distance that an {@link Orthogonobot} should stay from the edge of the battlefield.
    */
   private static final int EDGE_DISTANCE = 150;
-  
+
   /**
    * The distance that an {@link Orthogonobot} should move when trying to dodge a bullet.
    */
@@ -65,22 +64,6 @@ public class Orthogonobot extends AdvancedRobot {
   private boolean initialRadarTurn = true;
 
   /**
-   * If this {@link Orthogonobot} should try to lead its target. Will be disabled if it misses too
-   * much.
-   */
-  private boolean leadTarget = true;
-
-  /**
-   * The number of shots that this {@link Orthogonobot} has fired in this round.
-   */
-  private long numShotsFired = 0;
-
-  /**
-   * The number of bullets that this {@link Orthogonobot} has fired, but missed the target.
-   */
-  private long numMisses = 0;
-
-  /**
    * Where this {@link Orthogonobot} wants to move to assuming nothing happens (i.e. another bullet
    * is fired or it gets too close to the edge of the battlefield).
    */
@@ -108,6 +91,8 @@ public class Orthogonobot extends AdvancedRobot {
       return DODGE_AMOUNT;
     }
     else {
+      // Might not be called if the Orthogonobot does not get close to the edge of the
+      // battlefield.
       return -1 * DODGE_AMOUNT;
     }
   }
@@ -218,34 +203,24 @@ public class Orthogonobot extends AdvancedRobot {
       this.setTurnRight(this.bodyTurnAngle);
 
       // Determine where to turn the gun
-      double turnAngle;
-
-      if (this.leadTarget && this.numShotsFired >= 10
-          && ((double) this.numMisses) / this.numShotsFired > 0.5) {
-        this.leadTarget = false;
-      }
-
-      turnAngle = Utils.normalRelativeAngleDegrees(shortestBearing - this.getGunHeading());
+      double turnAngle = Utils.normalRelativeAngleDegrees(shortestBearing - this.getGunHeading());
       this.setTurnGunRight(turnAngle);
 
       // Fire if there is enough energy and the gun is done turning.
       double currentEnergy = this.getEnergy();
-      if (Utils.isNear(this.getGunTurnRemaining(), 0) || this.getGunTurnRemaining() < 2) {
+      if ((Utils.isNear(this.getGunTurnRemaining(), 0) || this.getGunTurnRemaining() < 2)
+          && Utils.isNear(this.getGunHeat(), 0)) {
         if (shortestDistance <= 50 && currentEnergy > 3) {
           this.setFire(3);
-          this.numShotsFired++;
         }
         else if (shortestDistance <= 100 && currentEnergy > 2.5) {
           this.setFire(2.5);
-          this.numShotsFired++;
         }
         else if (shortestDistance <= 150 && currentEnergy > 2) {
           this.setFire(2);
-          this.numShotsFired++;
         }
         else if (currentEnergy > 1) {
           this.setFire(1);
-          this.numShotsFired++;
         }
       }
 
@@ -266,36 +241,51 @@ public class Orthogonobot extends AdvancedRobot {
     if (eventCondition.getName().equals("nearEdge") && this.currentMode != BattleMode.NAVIGATION) {
       this.currentMode = BattleMode.NAVIGATION;
       switch (((NearEdgeCondition) eventCondition).getEdgeCase()) {
+      
       case BOTTOM:
         this.bodyTurnAngle = Utils.normalRelativeAngleDegrees(-this.getHeading());
         break;
+        
       case BOTTOM_LEFT:
         this.bodyTurnAngle = Utils.normalRelativeAngleDegrees(45 - this.getHeading());
         break;
+        
       case BOTTOM_RIGHT:
         this.bodyTurnAngle = Utils.normalRelativeAngleDegrees(315 - this.getHeading());
         break;
+        
       case LEFT:
         this.bodyTurnAngle = Utils.normalRelativeAngleDegrees(90 - this.getHeading());
         break;
+        
       case NONE:
+        // Should not be executed.  A NearEdgeCondition should not be triggered if the Orthogonobot
+        // is not near an edge.
         this.currentMode = BattleMode.NORMAL;
         break;
+        
       case RIGHT:
         this.bodyTurnAngle = Utils.normalRelativeAngleDegrees(270 - this.getHeading());
         break;
+        
       case TOP:
         this.bodyTurnAngle = Utils.normalRelativeAngleDegrees(180 - this.getHeading());
         break;
+        
       case TOP_LEFT:
         this.bodyTurnAngle = Utils.normalRelativeAngleDegrees(135 - this.getHeading());
         break;
+        
       case TOP_RIGHT:
         this.bodyTurnAngle = Utils.normalRelativeAngleDegrees(225 - this.getHeading());
         break;
+        
       default:
+        // Should not be called.  Would need an invalid enum.
         break;
       }
+      
+      // Move away from the edge.
       if (this.bodyTurnAngle > 90) {
         this.bodyTurnAngle -= 180;
         this.setAhead(-150);
@@ -312,14 +302,16 @@ public class Orthogonobot extends AdvancedRobot {
   }
 
   /**
-   * Makes this {@link Orthogonobot} move in reverse when it hits a wall.
+   * Makes this {@link Orthogonobot} enter {@link BattleMode#NAVIGATION} when it hits a wall.
    * 
    * @param event The {@link HitWallEvent} containing the information about hitting the wall.
    */
   @Override
   public void onHitWall(HitWallEvent event) {
+    
+    // Ideally should never be called.
     if (this.currentMode != BattleMode.NAVIGATION) {
-      out.println("OOOPS!");
+      this.currentMode = BattleMode.NAVIGATION;
     }
   }
 
@@ -337,17 +329,6 @@ public class Orthogonobot extends AdvancedRobot {
     this.enemyMap.get(enemyName).add(
         new EnemyTuple(event.getBearing() + this.getHeading(), event.getDistance(), event
             .getEnergy(), this.getX(), this.getY()));
-  }
-
-  /**
-   * Increments the number of misses when a fired bullet misses the enemy and hits a wall.
-   * 
-   * @param event The {@link BulletMissedEvent} containing information about the bullet hitting a
-   * wall.
-   */
-  @Override
-  public void onBulletMissed(BulletMissedEvent event) {
-    this.numMisses++;
   }
 
   /**

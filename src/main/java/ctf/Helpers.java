@@ -61,14 +61,14 @@ public final class Helpers {
 
     // Quadrant 3
     else if (enemyBearing < 270) {
-      x = Math.cos(Math.toRadians(enemyBearing - 180)) * enemyDistance * -1;
-      y = Math.sin(Math.toRadians(enemyBearing - 180)) * enemyDistance * -1;
+      x = Math.sin(Math.toRadians(enemyBearing - 180)) * enemyDistance * -1;
+      y = Math.cos(Math.toRadians(enemyBearing - 180)) * enemyDistance * -1;
     }
 
     // Quadrant 4
     else {
-      x = Math.sin(Math.toRadians(enemyBearing - 270)) * enemyDistance * -1;
-      y = Math.cos(Math.toRadians(enemyBearing - 270)) * enemyDistance;
+      x = Math.cos(Math.toRadians(enemyBearing - 270)) * enemyDistance * -1;
+      y = Math.sin(Math.toRadians(enemyBearing - 270)) * enemyDistance;
     }
     return new Point(x + currentX, y + currentY);
   }
